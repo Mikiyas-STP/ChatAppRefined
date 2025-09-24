@@ -28,7 +28,10 @@ async function fetchAndDisplayMessages() {
             `;
             messagesContainer.appendChild(messageElement);
         });
-    } catch (error) {
+        //Automatically scroll to the bottom of the chat window
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    catch (error) {
         console.error('Failed to fetch messages:', error);
         messagesContainer.innerHTML = 'Error: Could not load messages.';
     }
