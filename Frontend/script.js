@@ -68,3 +68,6 @@ messageForm.addEventListener('submit', async (event) => {
         alert('Error: Could not send message.');
     }
 });
+
+//polling functionality - i set an interval to fetch messages every 3 sec.
+setInterval(fetchAndDisplayMessages, 3000);
