@@ -1,4 +1,4 @@
-const backendUrl = 'http://localhost:3000'; // The URL of your running server
+const backendUrl = 'https://mikiyas-stp-chatapp-refined-backend.hosting.codeyourfuture.io'; // The URL of your running server
 // Get the container where messages will be displayed
 const messagesContainer = document.getElementById('chat-messages');
 const messageForm = document.getElementById('message-form');
