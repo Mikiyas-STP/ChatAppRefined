@@ -1,4 +1,12 @@
-const backendUrl = 'https://mikiyas-stp-chatapp-refined-backend.hosting.codeyourfuture.io';
+//Environment Aware Backend URL
+let backendUrl;
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    backendUrl = 'http://localhost:3000';
+    console.log('Running in local mode. Using local backend.');
+} else {
+    backendUrl = 'https://mikiyas-stp-chatapp-refined-backend.hosting.codeyourfuture.io';
+    console.log('Running in deployed mode. Using live backend.');
+}
 const messagesContainer = document.getElementById('chat-messages');
 const messageForm = document.getElementById('message-form');
 const usernameInput = document.getElementById('username-input');
