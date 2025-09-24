@@ -1,44 +1,38 @@
-const backendUrl = 'https://mikiyas-stp-chatapp-refined-backend.hosting.codeyourfuture.io'; // The URL of your running server
-// Get the container where messages will be displayed
+const backendUrl = 'https://mikiyas-stp-chatapp-refined-backend.hosting.codeyourfuture.io';
 const messagesContainer = document.getElementById('chat-messages');
 const messageForm = document.getElementById('message-form');
 const usernameInput = document.getElementById('username-input');
 const messageInput = document.getElementById('message-input');
-
-// Function to fetch all messages from the server and display them
-async function fetchAndDisplayMessages() {
+//Connect to the WebSocket server (this line is correct from your code)
+const socket = io(backendUrl);
+//This function just adds a single message to the chat window.
+function addMessageToChat(message) {
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message');
+    const formattedTimestamp = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    messageElement.innerHTML = `
+        <span class="username">${message.username}:</span>
+        <span class="text">${message.text}</span>
+        <span class="timestamp">${formattedTimestamp}</span>
+    `;
+    messagesContainer.appendChild(messageElement);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+async function fetchInitialMessages() {
     try {
         const response = await fetch(`${backendUrl}/messages`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
         const messages = await response.json();
-        // Clear any existing messages
+        
         messagesContainer.innerHTML = '';
-        // Loop through each message and add it to the display
         messages.forEach(message => {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message');
-            // Format the timestamp to be more readable
-            const formattedTimestamp = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            messageElement.innerHTML = `
-                <span class="username">${message.username}:</span>
-                <span class="text">${message.text}</span>
-                <span class="timestamp">${formattedTimestamp}</span>
-            `;
-            messagesContainer.appendChild(messageElement);
+            addMessageToChat(message);
         });
-        //Automatically scroll to the bottom of the chat window
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-    catch (error) {
-        console.error('Failed to fetch messages:', error);
+
+    } catch (error) {
+        console.error('Failed to fetch initial messages:', error);
         messagesContainer.innerHTML = 'Error: Could not load messages.';
     }
 }
-fetchAndDisplayMessages();
-
-//for sending messages
 messageForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     const username = usernameInput.value;
@@ -47,30 +41,24 @@ messageForm.addEventListener('submit', async (event) => {
         alert('Please enter both a username and a message.');
         return;
     }
-    const newMessage = {
-        username: username,
-        text: text
-    };
-
+    const newMessage = { username, text };
     try {
-        const response = await fetch(`${backendUrl}/messages`, {
+        await fetch(`${backendUrl}/messages`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newMessage)
         });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        messageInput.value = '';
-        fetchAndDisplayMessages();
+        messageInput.value = ''; // Just clear the input field.
     } catch (error) {
         console.error('Failed to send message:', error);
         alert('Error: Could not send message.');
     }
 });
-
-//polling functionality - i set an interval to fetch messages every 3 sec.
-setInterval(fetchAndDisplayMessages, 3000);
+// We listen for the 'newMessage' event broadcast by the server.
+socket.on('newMessage', (message) => {
+    addMessageToChat(message); // When we get a new message, we add it to the chat.
+});
+// REMOVED! The polling is no longer needed.
+// setInterval(fetchAndDisplayMessages, 3000);
+// Call the function to load the initial chat history when the page opens.
+fetchInitialMessages();
