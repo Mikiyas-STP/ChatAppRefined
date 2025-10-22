@@ -23,8 +23,17 @@ let messages = [
     timestamp: new Date(),
   },
 ];
-app.get("/", (req, res) => {
+app.get("/messages", (req, res) => {
   res.json(messages);
+});
+app.get("/", (req, res) => {
+    res.json({message: "it is running",
+        endpoint: {
+            messages: "/messages",
+            WebSocket: "ws://" + req.get("host")
+        
+    }
+})
 });
 app.post("/messages", (req, res) => {
   const newMessage = {
