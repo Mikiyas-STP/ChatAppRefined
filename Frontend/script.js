@@ -28,7 +28,7 @@ function addMessageToChat(message) {
 }
 async function fetchInitialMessages() {
     try {
-        const response = await fetch(`${backendUrl}/messages`);
+        const response = await fetch(`${backendUrl}`);
         const messages = await response.json();
         
         messagesContainer.innerHTML = '';
