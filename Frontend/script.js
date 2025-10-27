@@ -15,16 +15,13 @@ const messagesContainer = document.getElementById("chat-messages");
 const messageForm = document.getElementById("message-form");
 const usernameInput = document.getElementById("username-input");
 const messageInput = document.getElementById("message-input");
-//Connect to the WebSocket server (this line is correct from your code)
-const socket = io(backendUrl);
-//This function just adds a single message to the chat window.
+const socket = io(backendUrl);     //connect to the websocket server
+
+//Function to add a single message to the chat window
 function addMessageToChat(message) {
   const messageElement = document.createElement("div");
   messageElement.classList.add("message");
-  const formattedTimestamp = new Date(message.timestamp).toLocaleTimeString(
-    [],
-    { hour: "2-digit", minute: "2-digit" }
-  );
+  const formattedTimestamp = new Date(message.timestamp).toLocaleTimeString( [], { hour: "2-digit", minute: "2-digit" } );
   messageElement.innerHTML = `
         <span class="username">${message.username}:</span>
         <span class="text">${message.text}</span>
@@ -33,11 +30,11 @@ function addMessageToChat(message) {
   messagesContainer.appendChild(messageElement);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
+//helper function to fetch initial messages from backend
 async function fetchInitialMessages() {
   try {
     const response = await fetch(`${backendUrl}/messages`);
     const messages = await response.json();
-
     messagesContainer.innerHTML = "";
     messages.forEach((message) => {
       addMessageToChat(message);
@@ -47,6 +44,8 @@ async function fetchInitialMessages() {
     messagesContainer.innerHTML = "Error: Could not load messages.";
   }
 }
+
+//Form eventlistener on submit
 messageForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const username = usernameInput.value;
@@ -68,11 +67,10 @@ messageForm.addEventListener("submit", async (event) => {
     alert("Error: Could not send message.");
   }
 });
-// We listen for the 'newMessage' event broadcast by the server.
+
+//Listening for the 'newMessage' event broadcast by the server
 socket.on("newMessage", (message) => {
   addMessageToChat(message); // When we get a new message, we add it to the chat.
 });
-// REMOVED! The polling is no longer needed.
-// setInterval(fetchAndDisplayMessages, 3000);
-// Call the function to load the initial chat history when the page opens.
+//when the page open, call the initial messages
 fetchInitialMessages();
