@@ -19,16 +19,35 @@ const socket = io(backendUrl);     //connect to the websocket server
 
 //Function to add a single message to the chat window
 function addMessageToChat(message) {
+
   const messageElement = document.createElement("div");
   messageElement.classList.add("message");
-  const formattedTimestamp = new Date(message.timestamp).toLocaleTimeString( [], { hour: "2-digit", minute: "2-digit" } );
-  messageElement.innerHTML = `
-        <span class="username">${message.username}:</span>
-        <span class="text">${message.text}</span>
-        <span class="timestamp">${formattedTimestamp}</span>
-    `;
+  const usernameSpan = document.createElement("span");
+  usernameSpan.classList.add("username");
+  usernameSpan.textContent = message.username + ":"; 
+  const textSpan = document.createElement("span");
+  textSpan.classList.add("text");
+  textSpan.textContent = message.text;
+  const timestampSpan = document.createElement("span");
+  timestampSpan.classList.add("timestamp");
+  const formattedTimestamp = new Date(message.timestamp).toLocaleTimeString(
+    [],
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+  );
+  timestampSpan.textContent = formattedTimestamp;
+
+  messageElement.appendChild(usernameSpan);
+  messageElement.appendChild(textSpan);
+  messageElement.appendChild(timestampSpan);
+
   messagesContainer.appendChild(messageElement);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+
+
 }
 //helper function to fetch initial messages from backend
 async function fetchInitialMessages() {
@@ -44,6 +63,14 @@ async function fetchInitialMessages() {
     messagesContainer.innerHTML = "Error: Could not load messages.";
   }
 }
+
+
+
+
+
+
+
+
 
 //Form eventlistener on submit
 messageForm.addEventListener("submit", async (event) => {
